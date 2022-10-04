@@ -1,0 +1,26 @@
+/* search bar */
+form {
+	border: 2px solid black;
+	border-radius: 5px;
+	display: flex;
+	width: 200px;
+	padding: 2px;
+	justify-content: space-between;
+}
+input[type="search"] {
+	border: none;
+	background: transparent;
+	background-color: inherit;
+}
+input[type="search"]:focus {
+	outline: none;
+}
+.search-btn {
+	border: none;
+	background-color: white;
+}
+
+.search-icon {
+	height: 15px;
+	fill: rgb(97, 96, 96);
+}
