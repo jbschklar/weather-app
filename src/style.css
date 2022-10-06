@@ -1,5 +1,26 @@
+* {
+	font-family: sans-serif;
+}
+body {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-around;
+}
+header {
+	width: 100%;
+}
+html {
+	height: 100%;
+}
+body {
+	min-height: 100%;
+}
 /* search bar */
 form {
+	margin-left: 30px;
 	border: 2px solid black;
 	border-radius: 5px;
 	display: flex;
@@ -23,4 +44,67 @@ input[type="search"]:focus {
 .search-icon {
 	height: 15px;
 	fill: rgb(97, 96, 96);
+}
+
+/* tabs */
+.tab-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 30px;
+}
+.tab {
+	background-color: rgb(226, 221, 221);
+	padding: 5px;
+}
+.selected {
+	font-weight: 900;
+	padding: 10px;
+}
+/* main display */
+.main-display {
+	margin-top: 30px;
+}
+.display-container {
+	background-color: rgb(226, 221, 221);
+	width: 50vw;
+	display: flex;
+	flex-direction: column;
+	min-height: 350px;
+	align-items: center;
+	padding: 15px;
+}
+.temp-container {
+	width: 100%;
+	display: flex;
+	justify-content: space-around;
+}
+.temp-data {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	padding-bottom: 15px;
+}
+.high-low {
+	font-size: 1.5rem;
+}
+.curr-temp {
+	font-size: 2.5rem;
+}
+.feels-like {
+	font-size: 1.5rem;
+}
+
+.icon-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 15px;
+}
+.temp-icon {
+	height: 100px;
+	width: auto;
+}
+a {
+	font-size: 0.5rem;
 }
