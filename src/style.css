@@ -65,7 +65,7 @@ input[type="search"]:focus {
 .main-display {
 	margin-top: 30px;
 }
-.display-container {
+.container {
 	background-color: rgb(226, 221, 221);
 	width: 50vw;
 	display: flex;
@@ -74,10 +74,39 @@ input[type="search"]:focus {
 	align-items: center;
 	padding: 15px;
 }
+.five-day {
+	/* background-color: rgb(226, 221, 221);
+	width: 50vw;
+	min-height: 350px; */
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	grid-template-rows: min-content;
+}
+.five-day h1 {
+	grid-column: 1 /-1;
+	text-align: center;
+}
+.forcast {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	gap: 15px;
+}
 .temp-container {
 	width: 100%;
 	display: flex;
 	justify-content: space-around;
+}
+.forcast-date {
+	font-size: 1rem;
+	text-align: center;
+}
+.highlow-container {
+	display: flex;
+	flex-direction: column;
+	padding-left: 30px;
+	gap: 15px;
 }
 .temp-data {
 	display: flex;
@@ -103,6 +132,10 @@ input[type="search"]:focus {
 }
 .temp-icon {
 	height: 100px;
+	width: auto;
+}
+.forcast-icon {
+	height: 30px;
 	width: auto;
 }
 a {
