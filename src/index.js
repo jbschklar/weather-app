@@ -27,65 +27,48 @@ const oneDayDisplay = function (data) {
     </div>`;
 };
 
+// Need to refactor this to allow loop over array of data.list to render each date's column on display with next index
+
+const getHighLow = function (arr) {
+	let high = arr[0].main.temp_max;
+	let low = arr[0].main.temp_min;
+	for (let i = 0; i < arr.length; i++) {
+		const temp = arr[i].main.temp;
+		if (temp > high) high = temp;
+		if (temp < low) low = temp;
+	}
+	return { high, low };
+};
+
 const fiveDayDisplay = function (data) {
-	display.classList.add("five-day");
-	display.innerHTML = `
-    <h1>${data.city.name}</h1>
-				<div class="forcast day-one">
-					<h2 class="forcast-date">${formatDate(data)}</h2>
-					<div class="highlow-container">
-						<span class="high-temp">High: ${Math.round(data.list[0].main.temp_max)}°</span>
-						<span class="low-temp">Low: ${Math.round(data.list[0].main.temp_min)}°</span>
-					</div>
-					<div class="icon-container">
-						<img src="/sun.png" class="forcast-icon" />
-					</div>
-				</div>
-				<div class="forcast day-two">
-					<h2 class="forcast-date">Tuesday</h2>
-					<div class="highlow-container">
-						<span class="high-temp">High: 75°</span>
-						<span class="low-temp">Low: 50°</span>
-					</div>
-					<div class="icon-container">
-						<img src="/sun.png" class="forcast-icon" />
-					</div>
-				</div>
-				<div class="forcast day-three">
-					<h2 class="forcast-date">Wednesday</h2>
-					<div class="highlow-container">
-						<span class="high-temp">High: 75°</span>
-						<span class="low-temp">Low: 50°</span>
-					</div>
-					<div class="icon-container">
-						<img src="/sun.png" class="forcast-icon" />
-					</div>
-				</div>
-				<div class="forcast day-four">
-					<h2 class="forcast-date">Thursday</h2>
-					<div class="highlow-container">
-						<span class="high-temp">High: 75°</span>
-						<span class="low-temp">Low: 50°</span>
-					</div>
-					<div class="icon-container">
-						<img src="/sun.png" class="forcast-icon" />
-					</div>
-				</div>
-				<div class="forcast day-five">
-					<h2 class="forcast-date">Friday</h2>
-					<div class="highlow-container">
-						<span class="high-temp">High: 75°</span>
-						<span class="low-temp">Low: 50°</span>
-					</div>
-					<div class="icon-container">
-						<img src="/sun.png" class="forcast-icon" />
-					</div>
-				</div>
-    `;
+	const forcastArr = [
+		data.list.slice(1, 9),
+		data.list.slice(9, 17),
+		data.list.slice(17, 25),
+		data.list.slice(25, 33),
+		data.list.slice(33),
+	];
+	for (let i = 0; i < 5; i++) {
+		const forcast = document.createElement("div");
+		const { high, low } = getHighLow(forcastArr[i]);
+
+		display.classList.add("five-day");
+		forcast.classList.add("forcast");
+		forcast.innerHTML = `
+        <h2 class="forcast-date">${formatDate(forcastArr[i][0])}</h2>
+        <div class="highlow-container">
+            <span class="high-temp">High: ${Math.round(high)}°</span>
+            <span class="low-temp">Low: ${Math.round(low)}°</span>
+        </div>
+        <div class="icon-container">
+            <img src="/sun.png" class="forcast-icon" />
+        </div>`;
+		display.appendChild(forcast);
+	}
 };
 
 const formatDate = function (data) {
-	const date = data.list[0].dt_txt.slice(0, 10);
+	const date = data.dt_txt.slice(0, 10);
 	const year = date.slice(0, 4);
 	const month = date.slice(5, 7);
 	const day = date.slice(8, 10);
@@ -95,8 +78,6 @@ const getLocalWeather = async function (position, type) {
 	try {
 		const { latitude } = position.coords;
 		const { longitude } = position.coords;
-		const today = "weather";
-		const fiveDay = "forecast";
 		const response = await fetch(
 			`https://api.openweathermap.org/data/2.5/${type}?lat=${latitude}&lon=${longitude}&appid=e548290df6fc88b40ad44f22ee99dc3f&units=imperial`,
 			{ mode: "cors" }
@@ -119,6 +100,7 @@ const init = function (type) {
 
 tabs.forEach((tab) => {
 	tab.addEventListener("click", (e) => {
+		if (e.target.classList.contains("selected")) return;
 		tabs.forEach((tab) => tab.classList.toggle("selected"));
 		display.innerHTML = "";
 		if (e.target.textContent === "Today") {
@@ -129,4 +111,4 @@ tabs.forEach((tab) => {
 	});
 });
 
-// init();
+init("weather");
