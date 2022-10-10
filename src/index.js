@@ -1,11 +1,17 @@
 import "./style.css";
 import { lightFormat } from "date-fns";
+import { rangeRight } from "lodash";
 
 const sunIcon = "/sun.png";
+const cloudIcon = "/cloudy.png";
+const rainIcon = "/rain.png";
+const stormIcon = "/storm.png";
+const snowIcon = "/snowing.png";
 const tabs = document.querySelectorAll(".tab");
 const display = document.querySelector(".container");
 
 const oneDayDisplay = function (data) {
+	console.log(data);
 	display.classList.remove("five-day");
 	display.innerHTML = `
     <h1>${data.name}</h1>
@@ -21,13 +27,31 @@ const oneDayDisplay = function (data) {
 						)}°</span>
         </div>
         <div class="icon-container">
-			<img src=${sunIcon} class="temp-icon" />
+			<img src=${getIcon(data.weather[0].main)} class="temp-icon" />
 			<span class="icon-description">${data.weather[0].main}</span>
 		</div>
     </div>`;
 };
 
-// Need to refactor this to allow loop over array of data.list to render each date's column on display with next index
+// const getDays = function (arr) {
+// 	let dayOne = [];
+// 	arr.forEach((obj, i) => {
+// 		if (i === 0 || obj.dt_txt.slice(8, 10) === arr[i - 1].dt_txt.slice(8, 10)) {
+// 			dayArr.push(obj);
+// 		} else {
+// 			forcastArr.push();
+// 		}
+// 	});
+// };
+
+const getIcon = function (str) {
+	const string = str.toLowerCase();
+	if (string.includes("cloud")) return cloudIcon;
+	if (string.includes("rain")) return rainIcon;
+	if (string.includes("storm")) return stormIcon;
+	if (string.includes("snow")) return snowIcon;
+	return sunIcon;
+};
 
 const getHighLow = function (arr) {
 	let high = arr[0].main.temp_max;
@@ -41,6 +65,7 @@ const getHighLow = function (arr) {
 };
 
 const fiveDayDisplay = function (data) {
+	console.log(data);
 	const forcastArr = [
 		data.list.slice(1, 9),
 		data.list.slice(9, 17),
@@ -61,7 +86,9 @@ const fiveDayDisplay = function (data) {
             <span class="low-temp">Low: ${Math.round(low)}°</span>
         </div>
         <div class="icon-container">
-            <img src="/sun.png" class="forcast-icon" />
+            <img src=${getIcon(
+							forcastArr[i][3].weather[0].main
+						)} class="forcast-icon" />
         </div>`;
 		display.appendChild(forcast);
 	}
