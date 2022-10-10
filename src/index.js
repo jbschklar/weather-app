@@ -8,7 +8,10 @@ const rainIcon = "/rain.png";
 const stormIcon = "/storm.png";
 const snowIcon = "/snowing.png";
 const tabs = document.querySelectorAll(".tab");
+const form = document.querySelector("form");
+const search = document.getElementById("location-search");
 const display = document.querySelector(".container");
+let location;
 
 const oneDayDisplay = function (data) {
 	console.log(data);
@@ -73,11 +76,12 @@ const fiveDayDisplay = function (data) {
 		data.list.slice(25, 33),
 		data.list.slice(33),
 	];
+	display.classList.add("five-day");
+	display.innerHTML = `<h1>${data.city.name}</h1>`;
 	for (let i = 0; i < 5; i++) {
 		const forcast = document.createElement("div");
 		const { high, low } = getHighLow(forcastArr[i]);
 
-		display.classList.add("five-day");
 		forcast.classList.add("forcast");
 		forcast.innerHTML = `
         <h2 class="forcast-date">${formatDate(forcastArr[i][0])}</h2>
@@ -115,8 +119,38 @@ const getLocalWeather = async function (position, type) {
 	} catch (error) {
 		console.log(error);
 	}
+	display.classList.remove("loading");
 };
+
+const getUSWeather = async function (location, type, state) {
+	try {
+		const response = await fetch(
+			`https://api.openweathermap.org/data/2.5/${type}?q=${location},${state},US&appid=e548290df6fc88b40ad44f22ee99dc3f&units=imperial`,
+			{ mode: "cors" }
+		);
+		const data = await response.json();
+		console.log(data);
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+const getIntWeather = async function (location, type, country) {
+	try {
+		const response = await fetch(
+			`https://api.openweathermap.org/data/2.5/${type}?q=${location},${country}&appid=e548290df6fc88b40ad44f22ee99dc3f&units=imperial`,
+			{ mode: "cors" }
+		);
+		const data = await response.json();
+		console.log(data);
+	} catch (error) {
+		console.log(error);
+	}
+};
+
 const init = function (type) {
+	display.classList.add("loading");
+	display.innerHTML = "<p>Loading ...</p>";
 	navigator.geolocation.getCurrentPosition(
 		(pos) => getLocalWeather(pos, type),
 		(err) => {
@@ -127,7 +161,11 @@ const init = function (type) {
 
 tabs.forEach((tab) => {
 	tab.addEventListener("click", (e) => {
-		if (e.target.classList.contains("selected")) return;
+		if (
+			e.target.classList.contains("selected") ||
+			display.classList.contains("loading")
+		)
+			return;
 		tabs.forEach((tab) => tab.classList.toggle("selected"));
 		display.innerHTML = "";
 		if (e.target.textContent === "Today") {
@@ -138,4 +176,16 @@ tabs.forEach((tab) => {
 	});
 });
 
+form.addEventListener("submit", (e) => {
+	e.preventDefault();
+	console.log(search.value);
+});
+
 init("weather");
+getUSWeather("chicago", "weather", "IL");
+getIntWeather("london", "weather");
+
+//////////// Check List
+// - add loading icon/display img
+// - add search function
+// - tweek input to only allow city, zip, or city & state
