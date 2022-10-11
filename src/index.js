@@ -14,38 +14,42 @@ const display = document.querySelector(".container");
 let location;
 
 const oneDayDisplay = function (data) {
-	console.log(data);
+	const today = getDays(data.list)[0];
 	display.classList.remove("five-day");
 	display.innerHTML = `
-    <h1>${data.name}</h1>
+    <h1>${data.city.name}</h1>
     <div class="temp-container">
         <div class="temp-data">
-            <h2 class="date">${lightFormat(new Date(), "MM/dd/yyyy")}</h2>
-            <span class="high-low">High ${Math.round(
-							data.main.temp_max
-						)}° Low ${Math.round(data.main.temp_min)}°</span>
-            <span class="curr-temp">${Math.round(data.main.temp)}°F</span>
+            <div>
+            <h2 class="date">${formatDate(today[0])}</h2>
+            <h3>Current Temp</h3>
+            <span class="curr-temp">${Math.round(today[0].main.temp)}°F</span>
+            </div>
             <span class="feels-like">Feels like ${Math.round(
-							data.main.feels_like
+							today[0].main.feels_like
 						)}°</span>
         </div>
         <div class="icon-container">
-			<img src=${getIcon(data.weather[0].main)} class="temp-icon" />
-			<span class="icon-description">${data.weather[0].main}</span>
+			<img src=${getIcon(today[0].weather[0].main)} class="temp-icon" />
+			<span class="icon-description">${today[0].weather[0].main}</span>
 		</div>
     </div>`;
 };
 
-// const getDays = function (arr) {
-// 	let dayOne = [];
-// 	arr.forEach((obj, i) => {
-// 		if (i === 0 || obj.dt_txt.slice(8, 10) === arr[i - 1].dt_txt.slice(8, 10)) {
-// 			dayArr.push(obj);
-// 		} else {
-// 			forcastArr.push();
-// 		}
-// 	});
-// };
+const getDays = function (arr) {
+	const today = arr[0].dt_txt.slice(8, 10);
+	console.log(today);
+	let dayOne = [];
+	let forcast = [];
+	arr.forEach((obj) => {
+		if (obj.dt_txt.slice(8, 10) === today) dayOne.push(obj);
+	});
+	forcast.push(dayOne);
+	for (let i = dayOne.length; i < arr.length; i += 8) {
+		forcast.push(arr.slice(i, i + 8));
+	}
+	return forcast;
+};
 
 const getIcon = function (str) {
 	const string = str.toLowerCase();
@@ -69,13 +73,8 @@ const getHighLow = function (arr) {
 
 const fiveDayDisplay = function (data) {
 	console.log(data);
-	const forcastArr = [
-		data.list.slice(1, 9),
-		data.list.slice(9, 17),
-		data.list.slice(17, 25),
-		data.list.slice(25, 33),
-		data.list.slice(33),
-	];
+	const forcastArr = getDays(data.list).slice(1);
+	console.log(forcastArr);
 	display.classList.add("five-day");
 	display.innerHTML = `<h1>${data.city.name}</h1>`;
 	for (let i = 0; i < 5; i++) {
@@ -105,17 +104,20 @@ const formatDate = function (data) {
 	const day = date.slice(8, 10);
 	return `${month}/${day}/${year}`;
 };
-const getLocalWeather = async function (position, type) {
+const getLocalWeather = async function (position) {
+	const selected = document.querySelector(".selected");
 	try {
 		const { latitude } = position.coords;
 		const { longitude } = position.coords;
 		const response = await fetch(
-			`https://api.openweathermap.org/data/2.5/${type}?lat=${latitude}&lon=${longitude}&appid=e548290df6fc88b40ad44f22ee99dc3f&units=imperial`,
+			`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=e548290df6fc88b40ad44f22ee99dc3f&units=imperial`,
 			{ mode: "cors" }
 		);
 		const data = await response.json();
 
-		type === "weather" ? oneDayDisplay(data) : fiveDayDisplay(data);
+		selected.textContent === "Today"
+			? oneDayDisplay(data)
+			: fiveDayDisplay(data);
 	} catch (error) {
 		console.log(error);
 	}
@@ -148,11 +150,11 @@ const getIntWeather = async function (location, type, country) {
 	}
 };
 
-const init = function (type) {
+const init = function () {
 	display.classList.add("loading");
 	display.innerHTML = "<p>Loading ...</p>";
 	navigator.geolocation.getCurrentPosition(
-		(pos) => getLocalWeather(pos, type),
+		(pos) => getLocalWeather(pos),
 		(err) => {
 			console.log(err);
 		}
@@ -169,7 +171,7 @@ tabs.forEach((tab) => {
 		tabs.forEach((tab) => tab.classList.toggle("selected"));
 		display.innerHTML = "";
 		if (e.target.textContent === "Today") {
-			init("weather");
+			init("forecast");
 		} else {
 			init("forecast");
 		}
@@ -181,7 +183,7 @@ form.addEventListener("submit", (e) => {
 	console.log(search.value);
 });
 
-init("weather");
+init("forecast");
 getUSWeather("chicago", "weather", "IL");
 getIntWeather("london", "weather");
 
