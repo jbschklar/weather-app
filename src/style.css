@@ -11,6 +11,9 @@ body {
 }
 header {
 	width: 100%;
+	display: flex;
+	gap: 100px;
+	align-items: center;
 }
 html {
 	height: 100%;
@@ -45,7 +48,15 @@ input[type="search"]:focus {
 	height: 15px;
 	fill: rgb(97, 96, 96);
 }
-
+/* error message display */
+.error-display {
+	/* position: absolute;
+	top: 30px;
+	left: 45%; */
+	height: 30px;
+	width: auto;
+	color: red;
+}
 /* tabs */
 .tab-container {
 	display: flex;

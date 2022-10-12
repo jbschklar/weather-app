@@ -11,6 +11,7 @@ const tabs = document.querySelectorAll(".tab");
 const form = document.querySelector("form");
 const search = document.getElementById("location-search");
 const display = document.querySelector(".container");
+const errorDisplay = document.querySelector(".error-display");
 let location;
 
 // populates display for current weather under Today tab
@@ -39,7 +40,6 @@ const oneDayDisplay = function (data) {
 // returns array to seperate forcast API call list array which is in 3 hr increments into days
 const getDays = function (arr) {
 	const today = arr[0].dt_txt.slice(8, 10);
-	console.log(today);
 	let dayOne = [];
 	let forcast = [];
 	arr.forEach((obj) => {
@@ -75,9 +75,7 @@ const getHighLow = function (arr) {
 
 // populates 5 day display tab
 const fiveDayDisplay = function (data) {
-	console.log(data);
 	const forcastArr = getDays(data.list);
-	console.log(forcastArr);
 	display.classList.add("five-day");
 	display.innerHTML = `<h1>${data.city.name}</h1>`;
 	for (let i = 1; i <= 5; i++) {
@@ -126,11 +124,11 @@ const getLocalWeather = async function (position) {
 			{ mode: "cors" }
 		);
 		const data = await response.json();
-		console.log(data);
 
 		getCallType() === "weather" ? oneDayDisplay(data) : fiveDayDisplay(data);
 	} catch (error) {
-		console.log(error);
+		console.error(error);
+		errorHandler(error);
 	}
 	display.classList.remove("loading");
 };
@@ -139,9 +137,7 @@ const getLocalWeather = async function (position) {
 const getWeather = async function (location) {
 	let city;
 	let state;
-
 	[city, state] = location.split(",");
-	console.log(city, state);
 	try {
 		const response = state
 			? await fetch(
@@ -153,16 +149,17 @@ const getWeather = async function (location) {
 					{ mode: "cors" }
 			  );
 		const data = await response.json();
-		console.log(data);
 		getCallType() === "weather" ? oneDayDisplay(data) : fiveDayDisplay(data);
 	} catch (error) {
-		console.log(error);
+		console.error(error);
+		errorHandler(error);
 	}
 	display.classList.remove("loading");
 };
 
 // handles API calls either on page load or user search selection and pauses UI while loading to prevent errors
 const weatherHandler = function (type) {
+	errorDisplay.innerHTML = "";
 	display.classList.add("loading");
 	display.innerHTML = "<p>Loading ...</p>";
 	if (location) {
@@ -171,7 +168,8 @@ const weatherHandler = function (type) {
 		navigator.geolocation.getCurrentPosition(
 			(pos) => getLocalWeather(pos, type),
 			(err) => {
-				console.log(err);
+				console.error(err);
+				errorHandler(err);
 			}
 		);
 	}
@@ -195,6 +193,13 @@ form.addEventListener("submit", (e) => {
 	location = search.value;
 	weatherHandler();
 });
+
+// error handling/ display
+const errorHandler = function (error) {
+	const errorMsg = document.createElement("p");
+	errorMsg.textContent = error;
+	errorDisplay.appendChild(errorMsg);
+};
 
 // fn call on page load
 weatherHandler();
