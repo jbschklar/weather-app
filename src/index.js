@@ -180,7 +180,6 @@ const getWeather = async function (location) {
 
 // handles API calls either on page load or user search selection and pauses UI while loading to prevent errors
 const weatherHandler = function (type) {
-	errorDisplay.innerHTML = "";
 	display.classList.add("loading");
 	display.innerHTML = "<p>Loading ...</p>";
 	if (location) {
@@ -218,8 +217,9 @@ form.addEventListener("submit", (e) => {
 // error handling/ display
 const errorHandler = function (error) {
 	const errorMsg = document.createElement("p");
+	errorMsg.classList.add("error-display");
 	errorMsg.textContent = error;
-	errorDisplay.appendChild(errorMsg);
+	display.appendChild(errorMsg);
 };
 
 // fn call on page load
