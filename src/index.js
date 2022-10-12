@@ -15,10 +15,10 @@ const errorDisplay = document.querySelector(".error-display");
 let location;
 
 // populates display for current weather under Today tab
-const oneDayDisplay = function (data) {
+const oneDayDisplay = function (data, cityParent) {
 	display.classList.remove("five-day");
 	display.innerHTML = `
-    <h1>${data.name}</h1>
+    <h1>${data.name}, ${cityParent}</h1>
     <div class="temp-container">
         <div class="temp-data">
             <div>
@@ -35,6 +35,31 @@ const oneDayDisplay = function (data) {
 			<span class="icon-description">${data.weather[0].main}</span>
 		</div>
     </div>`;
+};
+
+// populates 5 day display tab
+const fiveDayDisplay = function (data, cityParent) {
+	const forcastArr = getDays(data.list);
+	display.classList.add("five-day");
+	display.innerHTML = `<h1>${data.city.name}, ${cityParent}</h1>`;
+	for (let i = 1; i <= 5; i++) {
+		const forcast = document.createElement("div");
+		const { high, low } = getHighLow(forcastArr[i]);
+
+		forcast.classList.add("forcast");
+		forcast.innerHTML = `
+        <h2 class="forcast-date">${formatDate(forcastArr[i][0])}</h2>
+        <div class="highlow-container">
+            <span class="high-temp">High: ${Math.round(high)}°</span>
+            <span class="low-temp">Low: ${Math.round(low)}°</span>
+        </div>
+        <div class="icon-container">
+            <img src=${getIcon(
+							forcastArr[i][3].weather[0].main
+						)} class="forcast-icon" />
+        </div>`;
+		display.appendChild(forcast);
+	}
 };
 
 // returns array to seperate forcast API call list array which is in 3 hr increments into days
@@ -73,28 +98,17 @@ const getHighLow = function (arr) {
 	return { high, low };
 };
 
-// populates 5 day display tab
-const fiveDayDisplay = function (data) {
-	const forcastArr = getDays(data.list);
-	display.classList.add("five-day");
-	display.innerHTML = `<h1>${data.city.name}</h1>`;
-	for (let i = 1; i <= 5; i++) {
-		const forcast = document.createElement("div");
-		const { high, low } = getHighLow(forcastArr[i]);
-
-		forcast.classList.add("forcast");
-		forcast.innerHTML = `
-        <h2 class="forcast-date">${formatDate(forcastArr[i][0])}</h2>
-        <div class="highlow-container">
-            <span class="high-temp">High: ${Math.round(high)}°</span>
-            <span class="low-temp">Low: ${Math.round(low)}°</span>
-        </div>
-        <div class="icon-container">
-            <img src=${getIcon(
-							forcastArr[i][3].weather[0].main
-						)} class="forcast-icon" />
-        </div>`;
-		display.appendChild(forcast);
+const getCityParent = async function (data) {
+	const { lon, lat } = data.coord ? data.coord : data.city.coord;
+	try {
+		const response = await fetch(
+			`http://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=5&appid=e548290df6fc88b40ad44f22ee99dc3f`
+		);
+		const [data] = await response.json();
+		const result = data.country === "US" ? data.state : data.country;
+		return result;
+	} catch (error) {
+		console.log(error);
 	}
 };
 
@@ -124,8 +138,10 @@ const getLocalWeather = async function (position) {
 			{ mode: "cors" }
 		);
 		const data = await response.json();
-
-		getCallType() === "weather" ? oneDayDisplay(data) : fiveDayDisplay(data);
+		const cityParent = await getCityParent(data);
+		getCallType() === "weather"
+			? oneDayDisplay(data, cityParent)
+			: fiveDayDisplay(data, cityParent);
 	} catch (error) {
 		console.error(error);
 		errorHandler(error);
@@ -139,6 +155,8 @@ const getWeather = async function (location) {
 	let state;
 	[city, state] = location.split(",");
 	try {
+		if (state && state.length > 3)
+			throw new Error("Please use two letter abreviation for state");
 		const response = state
 			? await fetch(
 					`https://api.openweathermap.org/data/2.5/${getCallType()}?q=${city},${state},US&appid=e548290df6fc88b40ad44f22ee99dc3f&units=imperial`,
@@ -149,7 +167,10 @@ const getWeather = async function (location) {
 					{ mode: "cors" }
 			  );
 		const data = await response.json();
-		getCallType() === "weather" ? oneDayDisplay(data) : fiveDayDisplay(data);
+		const cityParent = await getCityParent(data);
+		getCallType() === "weather"
+			? oneDayDisplay(data, cityParent)
+			: fiveDayDisplay(data, cityParent);
 	} catch (error) {
 		console.error(error);
 		errorHandler(error);
