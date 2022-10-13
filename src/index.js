@@ -11,7 +11,7 @@ const tabs = document.querySelectorAll(".tab");
 const form = document.querySelector("form");
 const search = document.getElementById("location-search");
 const display = document.querySelector(".container");
-const errorDisplay = document.querySelector(".error-display");
+const msgDisplay = document.querySelector(".msg-container");
 let location;
 
 // populates display for current weather under Today tab
@@ -32,7 +32,6 @@ const oneDayDisplay = function (data, cityParent) {
         </div>
         <div class="icon-container">
 			<img src=${getIcon(data.weather[0].main)} class="temp-icon" />
-			<span class="icon-description">${data.weather[0].main}</span>
 		</div>
     </div>`;
 };
@@ -172,7 +171,7 @@ const getWeather = async function (location) {
 			? oneDayDisplay(data, cityParent)
 			: fiveDayDisplay(data, cityParent);
 	} catch (error) {
-		console.error(error);
+		console.log(error.name);
 		errorHandler(error);
 	}
 	display.classList.remove("loading");
@@ -218,7 +217,11 @@ form.addEventListener("submit", (e) => {
 const errorHandler = function (error) {
 	const errorMsg = document.createElement("p");
 	errorMsg.classList.add("error-display");
-	errorMsg.textContent = error;
+	errorMsg.textContent =
+		error.name === "TypeError"
+			? "Whoops! Something went wrong 🤬. Please check your search and try again."
+			: error;
+
 	display.appendChild(errorMsg);
 };
 
@@ -229,3 +232,4 @@ weatherHandler();
 // - add loading icon/display img
 
 // - tweek input to only allow city, zip, or city & state
+// - display loading and error msg's in the same container/element as the city name by making that element hard coded in HTML

@@ -153,3 +153,9 @@ input[type="search"]:focus {
 a {
 	font-size: 0.5rem;
 }
+
+.msg-container {
+}
+.hidden {
+	display: none;
+}
