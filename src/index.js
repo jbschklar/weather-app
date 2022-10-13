@@ -101,7 +101,7 @@ const getCityParent = async function (data) {
 	const { lon, lat } = data.coord ? data.coord : data.city.coord;
 	try {
 		const response = await fetch(
-			`http://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=5&appid=e548290df6fc88b40ad44f22ee99dc3f`
+			`https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=5&appid=e548290df6fc88b40ad44f22ee99dc3f`
 		);
 		const [data] = await response.json();
 		const result = data.country === "US" ? data.state : data.country;
