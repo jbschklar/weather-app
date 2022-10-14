@@ -1,12 +1,17 @@
 import "./style.css";
 import { lightFormat } from "date-fns";
+import sun from "./sun.png";
+import cloud from "./cloudy.png";
+import rain from "./rain.png";
+import storm from "./storm.png";
+import snow from "./snowing.png";
 import { rangeRight } from "lodash";
 
-const sunIcon = "/sun.png";
-const cloudIcon = "/cloudy.png";
-const rainIcon = "/rain.png";
-const stormIcon = "/storm.png";
-const snowIcon = "/snowing.png";
+// const sunIcon = "/sun.png";
+// const cloudIcon = "/cloudy.png";
+// const rainIcon = "/rain.png";
+// const stormIcon = "/storm.png";
+// const snowIcon = "/snowing.png";
 const tabs = document.querySelectorAll(".tab");
 const form = document.querySelector("form");
 const search = document.getElementById("location-search");
@@ -78,11 +83,11 @@ const getDays = function (arr) {
 
 const getIcon = function (str) {
 	const string = str.toLowerCase();
-	if (string.includes("cloud")) return cloudIcon;
-	if (string.includes("rain")) return rainIcon;
-	if (string.includes("storm")) return stormIcon;
-	if (string.includes("snow")) return snowIcon;
-	return sunIcon;
+	if (string.includes("cloud")) return cloud;
+	if (string.includes("rain")) return rain;
+	if (string.includes("storm")) return storm;
+	if (string.includes("snow")) return snow;
+	return sun;
 };
 
 // returns high/low temp for each day since free version of open weather API doesn't have this feature
@@ -230,6 +235,6 @@ weatherHandler();
 
 //////////// Check List
 // - add loading icon/display img
-
+// - bundle images via webpack
 // - tweek input to only allow city, zip, or city & state
 // - display loading and error msg's in the same container/element as the city name by making that element hard coded in HTML
